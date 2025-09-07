@@ -5,7 +5,7 @@
   env.GREET = "devenv";
 
   # https://devenv.sh/packages/
-  packages = [ pkgs.git pkgs.sqlpage pkgs.docker ]; #pkgs.ollama ];
+  packages = [ pkgs.git pkgs.sqlpage pkgs.docker pkgs.postgresql.pg_config pkgs.ollama ];
 
   # https://devenv.sh/languages/
   # languages.rust.enable = true;
@@ -15,12 +15,12 @@
 
   # https://devenv.sh/services/
   services.postgres.enable = true;
-  services.postgres.extensions = exts: [ exts.pg_cron ];
+  services.postgres.extensions = exts: [ exts.anonymizer ];
 
   processes = {
-    # ollama.exec = ''
-    #   ${pkgs.ollama}/bin/ollama serve
-    # '';
+    ollama.exec = ''
+      ${pkgs.sqlpage}/bin/ollama serve
+    '';
     sqlpage.exec = ''
         ${pkgs.sqlpage}/bin/sqlpage \
             --web-root sqlpage/pages \

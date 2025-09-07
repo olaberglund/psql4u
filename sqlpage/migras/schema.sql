@@ -1,7 +1,7 @@
 begin;
 
-drop schema public cascade;
-create schema public;
+-- alter database "ola-olbe" set session_preload_libraries = 'anon';
+create extension if not exists anon cascade;
 
 create table if not exists allowed_port (
   port int primary key
