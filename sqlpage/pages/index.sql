@@ -1,12 +1,17 @@
-select 'button'as component;
-select 'Create' as title, 'blue' as color, 'handle/create_session.sql' as link;
+select 'form' as component, 'Create' as validate, 'handle/create_session.sql' as action;
+select 'select' as type,
+  'Create new session' as name,
+  'Select a schema...' as empty_option,
+  true as required,
+    '[{"label": "Orange", "value": 0}, {"label": "Apple", "value": 1}, {"label": "Banana", "value": 3}]' as options;
 
 select 'list' as component,
-  format('listed Sessions: %s / %s', (select count(*) from session where listed), (select count(*) from allowed_port)) as title;
+  format('Sessions: %s / %s', (select count(*) from session where listed), (select count(*) from allowed_port)) as title;
 
 select 'database' as icon,
   case when container_id is null then 'red' else 'green' end as color,
   case when container_id is not null then null else format('handle/start_session.sql?session_id=%s', id) end as link,
+  format('edit_session?session_id=%s', id) as edit_link,
   format('handle/stop_session.sql?session_id=%s', id) as delete_link,
   format($s$**ID: %s** | `Port %s` | %s ago$s$, id, port, to_char(age(now(), created_at), 'MI"m" SS"s"')) as description_md
 from session
