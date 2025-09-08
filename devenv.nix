@@ -5,7 +5,7 @@
   env.GREET = "devenv";
 
   # https://devenv.sh/packages/
-  packages = [ pkgs.git pkgs.sqlpage pkgs.docker pkgs.postgresql.pg_config pkgs.ollama ];
+  packages = [ pkgs.git pkgs.sqlpage pkgs.docker pkgs.postgresql.pg_config ]; # pkgs.ollama ];
 
   # https://devenv.sh/languages/
   # languages.rust.enable = true;
@@ -19,7 +19,7 @@
 
   processes = {
     ollama.exec = ''
-      ${pkgs.sqlpage}/bin/ollama serve
+      ollama serve
     '';
     sqlpage.exec = ''
         ${pkgs.sqlpage}/bin/sqlpage \

@@ -7,6 +7,8 @@ with available_port as (
 )
 insert into session (port)
 select port from available_port
-returning 'redirect' as component, '../index.sql?created' as link;
+returning 'redirect' as component, '../index.sql' as link;
 
-select 'redirect' as component, '../index.sql?ports_busy' as link;
+select 'cookie' as component, 'show_alert' as name, jsonb_build_object('name', 'ports_busy')::text as value;
+
+select 'redirect' as component, '../index.sql' as link;

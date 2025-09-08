@@ -12,6 +12,10 @@ set mcontainer_id = (
 update session
 set container_id = $mcontainer_id
 where id = $session_id::int and listed and container_id is null
-returning 'redirect' as component, '../index.sql?started_session=' || id as link;
+returning 'redirect' as component, '../index.sql' as link;
 
-select 'redirect' as component, '../index.sql?unkown_session=' || $session_id as link;
+
+select 'cookie' as component, 'show_alert' as name,
+  jsonb_build_object('name', 'session_unknown', 'session_id', $session_id)::text as value;
+
+select 'redirect' as component, '../index.sql' as link;
