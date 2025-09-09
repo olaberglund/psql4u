@@ -3,6 +3,7 @@
 {
   # https://devenv.sh/basics/
   env.GREET = "devenv";
+  env.PGDATABASE = "postgres";
 
   # https://devenv.sh/packages/
   packages = [ pkgs.git pkgs.sqlpage pkgs.docker pkgs.postgresql.pg_config ]; # pkgs.ollama ];
@@ -15,7 +16,12 @@
 
   # https://devenv.sh/services/
   services.postgres.enable = true;
-  services.postgres.extensions = exts: [ exts.anonymizer ];
+  services.postgres.extensions = exts: [ exts.anonymizer exts.pg_net ];
+  services.postgres.package = pkgs.postgresql_18;
+  services.postgres.initialDatabases = [ { name = "postgres"; } ];
+  services.postgres.settings = {
+      shared_preload_libraries = "pg_net";
+  };
 
   processes = {
     ollama.exec = ''

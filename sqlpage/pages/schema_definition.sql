@@ -19,8 +19,7 @@ select
     'Prompt'   as name,
     'textarea' as type;
 
-select 'list' as component;
-
-select substr(definition, 1, 20) || '...' as description,
-    'gray' as color
+select 'foldable' as component;
+select prompt as title, definition as description_md,
+  case when definition is null then 'gray' else 'green' end as color
 from schema_definition;
