@@ -3,8 +3,7 @@ set msession_id = (
     where id = $session_id::int and listed
 );
 
-
--- unkown session
+-- unknown session
 select 'cookie' as component, 'show_alert' as name,
   jsonb_build_object('name', 'unknown_session', 'session_id', $session_id)::text as value;
 
@@ -23,6 +22,13 @@ set mcontainer_id = (
     from session
     where id = $msession_id::int and container_id is not null
 );
+
+-- TODO: use docker api
+-- set _ = (
+--     select net.http_post(
+--       url => format('http://localhost:2375/%s/stop', $mcontainer_id)
+--   )
+-- );
 
 update session
 set listed = false

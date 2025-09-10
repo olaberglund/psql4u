@@ -1,21 +1,26 @@
-with net_call  as (
+with req(body) as (
+  select jsonb_build_object(
+      'model', 'gemma3:1b',
+      'system', sp.prompt,
+      'prompt', :Prompt,
+      'stream', false
+  )
+  from system_prompt sp
+  where sp.version = 1
+),
+net_call  as (
   select request_id
-  from system_prompt
+  from req
   cross join net.http_post(
     url => 'http://localhost:11434/api/generate'::text,
-    body => jsonb_build_object(
-        'model', 'gemma3:1b',
-        'system', system_prompt.prompt,
-        'prompt', :Prompt,
-        'stream', false
-    )
+    body => req.body
   ) t(request_id)
-  where version = 1
 ),
 new_schema as (
-  insert into schema_definition (prompt, request_id)
-  select :Prompt, request_id
+  insert into schema_definition (prompt, request_id, model)
+  select :Prompt, request_id, req.body->>'model'
   from net_call
+  cross join req
   returning id
 )
 update schema_definition

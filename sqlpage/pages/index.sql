@@ -24,10 +24,14 @@ where $show_alert::jsonb->>'name' = 'session_unknown';
 select 'form' as component, 'Create' as validate, 'handle/create_session.sql' as action;
 
 select 'select'         as type,
-  'Create new session'  as name,
+  'new_session_id'      as name,
+  'Create new session'  as label,
   'Select a schema...'  as empty_option,
   true                  as required,
-    '[{"label": "Flight logs", "value": 0}, {"label": "Stock trades", "value": 1}, {"label": "Torrent traffic", "value": 3}]' as options;
+  jsonb_agg(
+    jsonb_build_object('label', prompt, 'value', id)
+  ) as options
+from schema_definition;
 
 select 'list' as component,
   format('Sessions: %s / %s',

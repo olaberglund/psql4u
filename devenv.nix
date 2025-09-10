@@ -6,7 +6,7 @@
   env.PGDATABASE = "postgres";
 
   # https://devenv.sh/packages/
-  packages = [ pkgs.git pkgs.sqlpage pkgs.docker pkgs.postgresql.pg_config ]; # pkgs.ollama ];
+  packages = [ pkgs.git pkgs.sqlpage pkgs.docker pkgs.postgresql.pg_config pkgs.socat ]; # pkgs.ollama ];
 
   # https://devenv.sh/languages/
   # languages.rust.enable = true;
@@ -24,6 +24,7 @@
   };
 
   processes = {
+    docker_api.exec = "socat TCP-LISTEN:2375,reuseaddr,fork UNIX-CONNECT:/Users/ola-olbe/.docker/run/docker.sock";
     ollama.exec = ''
       ollama serve
     '';

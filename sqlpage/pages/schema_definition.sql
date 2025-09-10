@@ -20,6 +20,5 @@ select
     'textarea' as type;
 
 select 'foldable' as component;
-select prompt as title, definition as description_md,
-  case when definition is null then 'gray' else 'green' end as color
+select case when definition is null then 'Generating: ' || prompt else prompt end as title, definition as description_md
 from schema_definition;

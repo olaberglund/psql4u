@@ -18,6 +18,8 @@ create table if not exists session (
     port int not null references allowed_port(port),
     created_at timestamptz default now(),
     listed bool not null default true,
+    schema_id int not null references schema_definition(id),
+    temp_file text,
     container_id text unique
 );
 
@@ -27,24 +29,31 @@ create index if not exists idx_session_container_id on session (container_id) wh
 
 create table if not exists schema_definition (
     id int generated always as identity primary key,
-    session_id int references session(id),
     request_id int not null,
     created_at timestamptz default now(),
     prompt text not null,
+    model text not null,
     definition text,
-    response jsonb
+    response jsonb,
 );
-
-create index if not exists idx_schema_definition_session_id on schema_definition(session_id);
 
 create or replace function trig_net_response()
 returns trigger as $$
 begin
     update schema_definition sd
     set response = content::jsonb,
-        definition = (content::jsonb)->>'response'
-    from net._http_response nhp
-    where sd.request_id = nhp.id;
+        definition = (new.content::jsonb)->>'response'
+    where sd.request_id = new.id;
+
+    -- TODO: use docker api, but im going to end up with a pretty complex state machine
+    -- update session s
+    -- set response = content::jsonb,
+    --     listed =
+    --         case
+    --           when new.status_code >= 200 then false
+    --           else true
+    --         end
+    -- where s.request_id = new.id;
 
     return new;
 end;
@@ -70,4 +79,4 @@ on conflict do nothing;
 commit;
 
 
-CREATE TABLE bananas ( id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, variety TEXT, date_harvest TEXT, location TEXT, quantity INT ); CREATE TABLE fruit_suppliers ( id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, name TEXT, address TEXT, city TEXT, country TEXT ); CREATE TABLE fruit_markets ( id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, name TEXT, location TEXT, country TEXT ); CREATE TABLE banana_sales ( id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, banana_id INT REFERENCES bananas(id), supplier_id INT REFERENCES fruit_suppliers(id), date_sold TEXT, revenue NUMERIC ); CREATE TABLE fruit_suppliers_categories ( id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, name TEXT, category TEXT ); CREATE TABLE fruit_markets_regions ( id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, name TEXT, region TEXT ); CREATE TABLE banana_sales_details ( id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, banana_id INT, quantity_sold INT, sales_date TEXT, revenue NUMERIC );
+
