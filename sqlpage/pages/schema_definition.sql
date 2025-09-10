@@ -8,7 +8,7 @@ select 'alert'     as component,
   true             as dismissible
 where $show_alert::jsonb->>'name' = 'schema_created';
 
-select 'dynamic' as component, sqlpage.run_sql('shell.sql') as properties;
+select 'dynamic' as component, sqlpage.run_sql('shell.sql', json_build_object('from_url', '/schema_definition.sql')) as properties;
 
 select
     'form'          as component,

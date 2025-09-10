@@ -1,7 +1,7 @@
 set show_alert = sqlpage.cookie('show_alert');
 select 'cookie' as component, 'show_alert' as name, true as remove;
 
-select 'dynamic' as component, sqlpage.run_sql('shell.sql') as properties;
+select 'dynamic' as component, sqlpage.run_sql('shell.sql', json_build_object('from_url', '/index.sql')) as properties;
 
 select
   'alert'        as component,
