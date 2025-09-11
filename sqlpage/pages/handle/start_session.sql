@@ -1,3 +1,5 @@
+set debug_mode = sqlpage.cookie('debug_mode');
+
 set mport_mapping = (
   select port || ':5432'
   from session
@@ -10,12 +12,22 @@ set def = (
     from schema_definition
     where id = (select schema_id from session where id = $session_id::int and listed)
 );
+set f_data = (
+    select trim(regexp_replace(fake_data, '```sql|```', '', 'g'))
+    from schema_definition
+    where id = (select schema_id from session where id = $session_id::int and listed)
+);
 
 set _ = sqlpage.exec('sh', '-c', 'echo "$1" > "$2"', '', $def, $tmpfile);
+set _ = sqlpage.exec('sh', '-c', 'echo "$1" >> "$2"', '', $f_data, $tmpfile);
 
 set volume = (select format('%s:/docker-entrypoint-initdb.d/init.sql:ro', $tmpfile));
 
--- TODO : use docker api
+select 'cookie' as component, 'show_alert' as name, jsonb_build_object('name', 'debug', 'value', 'docker run --rm -e POSTGRES_PASSWORD=hunter2 -p ' || $mport_mapping || ' -v ' || $volume || ' postgres')::text as value;
+select 'redirect' as component, '../index.sql' as link
+where $debug_mode = 'true';
+
+-- -- TODO : use docker api
 set mcontainer_id = (
     select sqlpage.exec(
         'docker', 'run', '--rm',

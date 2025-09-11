@@ -13,6 +13,15 @@ select
 where $show_alert::jsonb->>'name' = 'ports_busy';
 
 select
+  'alert'                      as component,
+  'DEBUG'                     as title,
+  'blue'                       as color,
+  'info-circle'                as icon,
+  true                         as dismissible,
+  $show_alert::jsonb->>'value' as description
+where $show_alert::jsonb->>'name' = 'debug';
+
+select
   'alert'           as component,
   'Unknown session' as title,
   'red'             as color,
@@ -39,11 +48,12 @@ select 'list' as component,
       (select count(*) from allowed_port)
   ) as title;
 
-select 'database'                                                                                             as icon,
-  case when container_id is null then 'red' else 'green' end                                                  as color,
-  case when container_id is not null then null else format('handle/start_session.sql?session_id=%s', id) end  as link,
-  format('edit_session?session_id=%s', id)                                                                    as edit_link,
-  format('handle/stop_session.sql?session_id=%s', id)                                                         as delete_link,
-  format($s$**ID: %s** | `Port %s` | %s ago$s$, id, port, to_char(age(now(), created_at), 'MI"m" SS"s"'))     as description_md
+select 'database'                                                                                                          as icon,
+  case when container_id is null then 'red' else 'green' end                                                               as color,
+  case when container_id is not null then null else format('handle/start_session.sql?session_id=%s', session.id) end       as link,
+  format('edit_session?session_id=%s', session.id)                                                                         as edit_link,
+  format('handle/stop_session.sql?session_id=%s', session.id)                                                              as delete_link,
+  format($s$%s @  `Port %s` | %s ago$s$, sd.prompt, port, to_char(age(now(), session.created_at), 'MI"m" SS"s"'))  as description_md
 from session
-where listed order by created_at desc;
+join schema_definition sd on sd.id = session.schema_id
+where listed order by session.created_at desc;

@@ -6,12 +6,7 @@ select
     json_build_object(
         'title', 'Create new',
         'icon', 'file-ai',
-        'link', 'schema_definition.sql'
-    ) as menu_item,
-    json_build_object(
-        'title', 'Browse',
-        'icon', 'book',
-        'link', 'browser_schem as .sql'
+        'link', 'schema_definition.sql?tab=Schema+definition'
     ) as menu_item,
     json_build_object(
         'title', '',

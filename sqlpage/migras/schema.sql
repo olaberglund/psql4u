@@ -34,15 +34,17 @@ create table if not exists schema_definition (
     prompt text not null,
     model text not null,
     definition text,
-    response jsonb,
+    fake_data text,
+    response jsonb
 );
 
 create or replace function trig_net_response()
 returns trigger as $$
 begin
     update schema_definition sd
-    set response = content::jsonb,
-        definition = (new.content::jsonb)->>'response'
+    set response = new.content::jsonb,
+        definition = case when definition is null then (new.content::jsonb)->>'response' else definition end,
+        fake_data  = case when definition is null then null else (new.content::jsonb)->>'response' end
     where sd.request_id = new.id;
 
     -- TODO: use docker api, but im going to end up with a pretty complex state machine
@@ -65,18 +67,4 @@ after insert or update on net._http_response
 for each row
 execute function trig_net_response();
 
-create table if not exists system_prompt (
-    id int generated always as identity primary key,
-    version int not null,
-    created_at timestamptz default now(),
-    prompt text not null unique
-);
-
-insert into system_prompt (version, prompt)
-select 1, pg_read_file('../../../system_prompt.txt')
-on conflict do nothing;
-
 commit;
-
-
-
