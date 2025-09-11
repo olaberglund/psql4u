@@ -38,7 +38,10 @@ select 'select'         as type,
   'Select a schema...'  as empty_option,
   true                  as required,
   jsonb_agg(
-    jsonb_build_object('label', prompt, 'value', id)
+    jsonb_build_object(
+  'label', prompt || case when fake_data is null then '' else ' (fake data)' end,
+      'value', id
+    ) order by prompt
   ) as options
 from schema_definition;
 
