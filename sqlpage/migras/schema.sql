@@ -65,15 +65,15 @@ returns trigger as $$
 begin
     update session
     set create_response = coalesce(new.content::jsonb, '{}'::jsonb) || jsonb_build_object('status_code', new.status_code)
-    where create_request_id = new.id;
+    where create_request_id = new.id and create_response is null;
 
     update session
     set start_response = coalesce(new.content::jsonb, '{}'::jsonb) || jsonb_build_object('status_code', new.status_code)
-    where start_request_id = new.id;
+    where start_request_id = new.id and start_response is null;
 
     update session
     set stop_response = coalesce(new.content::jsonb, '{}'::jsonb) || jsonb_build_object('status_code', new.status_code)
-    where stop_request_id = new.id;
+    where stop_request_id = new.id and stop_response is null;
 
     return new;
 end;
@@ -91,12 +91,12 @@ begin
     update schema_definition
     set definition_response = new.content::jsonb || jsonb_build_object('status_code', new.status_code),
         definition = trim(regexp_replace((new.content::jsonb)->>'response', '```sql|```', '', 'g'))
-    where definition_request_id = new.id;
+    where definition_request_id = new.id and definition_response is null;
 
     update schema_definition
     set fake_data_response = new.content::jsonb || jsonb_build_object('status_code', new.status_code),
         fake_data = trim(regexp_replace((new.content::jsonb)->>'response', '```sql|```', '', 'g'))
-    where fake_data_request_id = new.id;
+    where fake_data_request_id = new.id and fake_data_response is null;
 
     return new;
 end;

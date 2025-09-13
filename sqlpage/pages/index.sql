@@ -46,7 +46,7 @@ select 'select'           as type,
 from schema_definition;
 
 select 'list' as component,
-  format('Sessions: %s / %s',
+  format('Active Sessions: %s / %s',
       (select count(*) from active_session),
       (select count(*) from allowed_port)
   ) as title;
@@ -61,16 +61,20 @@ select 'database' as icon,
   case when create_response->>'Id' is not null and start_response is null then format('handle/start_session.sql?session_id=%s', session.id) end       as link,
   format('edit_session?session_id=%s', session.id)                                                                         as edit_link,
   format('handle/stop_session.sql?session_id=%s', session.id)                                                              as delete_link,
-  format($s$%s %s @ `Port %s` | %s ago $s$,
-      case when stop_request_id is not null and stop_response is null then 'Stopping: '
-           when start_request_id is not null and start_response is null then 'Starting: '
-           when create_request_id is not null and create_response is null then 'Creating: '
+  format($s$%s (%s) @ `Port %s` | %s ago $s$,
+      sd.prompt,
+      case when stop_request_id is not null and stop_response is null then 'Stopping'
+           when stop_response->>'status_code' = '204' then 'Stopped'
+           when start_request_id is not null and start_response is null then 'Starting'
+           when start_response->>'status_code' = '204' then 'Running'
+           when create_request_id is not null and create_response is null then 'Creating'
+           when create_response->>'status_code' = '201' then 'Created'
            else ''
       end,
-      sd.prompt,
       port,
       to_char(age(now(), session.created_at),
       'MI"m" SS"s"')) as description_md
 from session
 join schema_definition sd on sd.id = session.schema_id
+where session.id in (select id from active_session)
 order by session.created_at desc;
