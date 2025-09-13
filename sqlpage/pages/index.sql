@@ -58,7 +58,7 @@ select 'database' as icon,
       when create_response->>'status_code' = '201' then 'red'
       else 'gray'
   end as color,
-  case when create_response->>'Id' is not null and start_response is null then format('handle/start_session.sql?session_id=%s', session.id) end       as link,
+  case when create_response->>'Id' is not null and start_request_id is null then format('handle/start_session.sql?session_id=%s', session.id) end       as link,
   format('edit_session?session_id=%s', session.id)                                                                         as edit_link,
   format('handle/stop_session.sql?session_id=%s', session.id)                                                              as delete_link,
   format($s$%s (%s) @ `Port %s` | %s ago $s$,
