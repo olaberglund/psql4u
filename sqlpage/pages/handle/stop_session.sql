@@ -1,6 +1,6 @@
 set msession_id = (
     select id from session
-    where id = $session_id::int and listed
+    where id = $session_id::int and start_response -
 );
 
 -- unknown session
@@ -11,10 +11,10 @@ select 'redirect' as component, '../index.sql' as link
 where $msession_id is null;
 
 -- stopped session
-update session
-set listed = false
-where id = $msession_id::int and container_id is null
-returning 'redirect' as component, '../index.sql' as link;
+-- update session
+-- set listed = false
+-- where id = $msession_id::int and container_id is null
+-- returning 'redirect' as component, '../index.sql' as link;
 
 -- started session
 set mcontainer_id = (
@@ -30,7 +30,7 @@ set mcontainer_id = (
 --   )
 -- );
 
-update session
-set listed = false
-where id = $msession_id::int
-returning sqlpage.exec('docker', 'stop', $mcontainer_id), 'redirect' as component, '../index.sql' as link;
+-- update session
+-- set listed = false
+-- where id = $msession_id::int
+-- returning sqlpage.exec('docker', 'stop', $mcontainer_id), 'redirect' as component, '../index.sql' as link;

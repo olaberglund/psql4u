@@ -28,7 +28,7 @@ select
 where $tab = 'Schema definition';
 
 select 'foldable' as component;
-select case when definition is null then 'Generating: ' || prompt else prompt end as title, definition as description_md
+select case when definition is null then 'Generating: ' || prompt else prompt end as title, '```sql' || definition || '```' as description_md
 from schema_definition
 where $tab = 'Schema definition'
 order by created_at desc;
@@ -39,7 +39,10 @@ where $tab = 'Fake data';
 
 with opts as (
   select jsonb_agg(
-    jsonb_build_object('label', prompt, 'value', id)
+    jsonb_build_object(
+      'label', prompt || case when fake_data is null then '' else ' (regenerate)' end,
+      'value', id
+    )
   ) as options
   from schema_definition
   where definition is not null

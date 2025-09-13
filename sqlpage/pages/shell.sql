@@ -4,14 +4,15 @@ select
     'database-heart' as icon,
     '/'              as link,
     json_build_object(
-        'title', 'Create new',
+        'title', 'Generation',
         'icon', 'file-ai',
         'link', 'schema_definition.sql?tab=Schema+definition'
     ) as menu_item,
     json_build_object(
-        'title', '',
+        'title', 'Debug mode',
         'icon', case sqlpage.cookie('debug_mode')
                   when 'true' then'bug'
                   else 'bug-off' end,
         'link', 'handle/toggle_debug.sql?back_url=' || $from_url
+
     ) as menu_item;

@@ -15,7 +15,7 @@ net_call as (
     timeout_milliseconds => 30000
   ) t(request_id)
 )
-insert into schema_definition (prompt, request_id, model)
+insert into schema_definition (prompt, definition_request_id, model)
 select :schema_prompt, request_id, req.body->>'model'
 from net_call
 cross join req;
