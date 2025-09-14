@@ -27,8 +27,10 @@ select
     'Write a short description of your desired schema...' as placeholder
 where $tab = 'Schema definition';
 
-select 'foldable' as component;
-select case when definition is null then 'Generating: ' || prompt else prompt end as title, '```sql' || definition || '```' as description_md
+select 'list' as component;
+-- select case when definition is null then 'Generating: ' || prompt else prompt end as title, '```sql' || definition || '```' as description_md
+
+select prompt as title, '/manage_schema_definition.sql?schema_id=' || id as link
 from schema_definition
 where $tab = 'Schema definition'
 order by created_at desc;

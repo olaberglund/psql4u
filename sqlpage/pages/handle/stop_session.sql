@@ -4,16 +4,11 @@ with session_container as (
   where id = $session_id::int
 ),
 net_req as (
-    select 
-      case when exists (select 1 from session where id = $session_id::int and start_request_id is null) then
-          net.http_delete(
-                url => format('http://localhost:2375/containers/%s'::text, container_id)
-          )
-      else 
-          net.http_post(
-                url => format('http://localhost:2375/containers/%s/stop'::text, container_id)
-          )
-      end as request_id
+    select
+      net.http_delete(
+            url => format('http://localhost:2375/containers/%s?force'::text, container_id)
+      )
+      as request_id
     from session_container
 )
 update session

@@ -52,11 +52,15 @@ create table if not exists session (
 create or replace view active_session as (
   select id, port
   from session
-  where coalesce(stop_response->>'status_code' in ('404', '500'), true)
+  -- a session is active if it has not been successfully stopped,
+  -- or didn't exist when attempting to stop it.
+  -- If stop_response is null, there's been no attempt to stop it.
+  where coalesce(stop_response->>'status_code' not in ('201', '404'), true)
 );
 
+drop index if exists idx_session_port_active_unique;
 create unique index if not exists idx_session_port_active_unique on session (port)
-    where coalesce(stop_response->>'status_code' in ('404', '500'), true);
+    where coalesce(stop_response->>'status_code' not in ('201', '404'), true);
 
 create index if not exists idx_session_container_id on session ((start_response->>'container_id'));
 
