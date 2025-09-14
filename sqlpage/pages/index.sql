@@ -45,6 +45,12 @@ select 'select'           as type,
   ) as options
 from schema_definition;
 
+select 'password' as type,
+    'password' as input_type,
+    'password' as name,
+    'Password' as label,
+    'Default: hunter2' as description;
+
 select 'button' as component;
 select 'Refresh' as title, '.' as  link, 'refresh' as icon;
 
@@ -61,7 +67,7 @@ select 'database' as icon,
       when create_response->>'status_code' = '201' then 'red'
       else 'gray'
   end as color,
-  case when create_response->>'Id' is not null and start_request_id is null then format('handle/start_session.sql?session_id=%s', session.id) end       as link,
+  case when create_response->>'status_code' = '201' and start_request_id is null and stop_request_id is null then format('handle/start_session.sql?session_id=%s', session.id) end       as link,
   format('edit_session?session_id=%s', session.id)                                                                         as edit_link,
   format('handle/stop_session.sql?session_id=%s', session.id)                                                              as delete_link,
   sd.prompt as title,
@@ -79,7 +85,8 @@ select 'database' as icon,
       coalesce(nullif(extract(hour from age(now(), session.created_at))::int, 0)::text || 'h ', '') ||
       coalesce(nullif(extract(minute from age(now(), session.created_at))::int, 0)::text || 'm ', '') ||
       coalesce(nullif(extract(second from age(now(), session.created_at))::int, 0)::text || 's ', '')
-      ) as description_md
+      ) as description_md,
+      'handle/get_logs?session_id=' || session.id as view_link
 from session
 join schema_definition sd on sd.id = session.schema_id
 where session.id in (select id from active_session)

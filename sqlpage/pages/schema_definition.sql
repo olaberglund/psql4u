@@ -27,12 +27,18 @@ select
     'Write a short description of your desired schema...' as placeholder
 where $tab = 'Schema definition';
 
-select 'list' as component;
--- select case when definition is null then 'Generating: ' || prompt else prompt end as title, '```sql' || definition || '```' as description_md
+select 'button' as component;
+select 'Refresh' as title, 'schema_definition.sql?tab=' || $tab as  link, 'refresh' as icon
+where $tab = 'Schema definition';
 
-select prompt as title, '/manage_schema_definition.sql?schema_id=' || id as link
+select 'list' as component
+where $tab = 'Schema definition';
+
+select prompt as title, 
+  '/manage_schema_definition.sql?schema_id=' || id as link,
+  case when definition is null then 'Generating...' end as description
 from schema_definition
-where $tab = 'Schema definition'
+where $tab = 'Schema definition' and definition_request_id is not null
 order by created_at desc;
 
 
@@ -57,9 +63,17 @@ select 'select'      as type,
   (select options from opts) as options
 where $tab = 'Fake data';
 
-select 'foldable' as component;
-select prompt as title, fake_data as description_md
-from schema_definition
-where $tab = 'Fake data' and fake_data is not null
-order by created_at desc;
+select 'button' as component;
+select 'Refresh' as title, 'schema_definition.sql?tab=' || $tab as  link, 'refresh' as icon
+where $tab = 'Fake data';
 
+
+select 'list' as component
+where $tab = 'Fake data';
+
+select prompt as title,
+    '/manage_fake_data.sql?schema_id=' || id as link,
+  case when fake_data is null then 'Generating...' end as description
+from schema_definition
+where $tab = 'Fake data' and fake_data_request_id is not null
+order by created_at desc;

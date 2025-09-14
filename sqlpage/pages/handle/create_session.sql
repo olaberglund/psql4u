@@ -11,7 +11,7 @@ net_req as (
           url => 'http://localhost:2375/containers/create'::text,
           body => jsonb_build_object(
               'Image', 'postgres',
-              'Env', array['POSTGRES_PASSWORD=hunter2'],
+              'Env', array['POSTGRES_PASSWORD=' || coalesce(nullif($password, ''), 'hunter2')],
               'HostConfig', json_build_object(
                   'AutoRemove', false,
                   'Binds', array[
@@ -20,7 +20,7 @@ net_req as (
                   ],
                   'PortBindings', jsonb_build_object(
                       '5432/tcp', array[
-                          jsonb_build_object('HostPort', 
+                          jsonb_build_object('HostPort',
                               (select port::text from available_port)
                           )
                       ]))))

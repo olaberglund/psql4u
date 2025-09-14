@@ -46,7 +46,8 @@ create table if not exists session (
 
     create_response jsonb,
     start_response jsonb,
-    stop_response jsonb
+    stop_response jsonb,
+    logs_response text
 );
 
 create or replace view active_session as (

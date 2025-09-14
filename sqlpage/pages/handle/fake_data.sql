@@ -18,7 +18,7 @@ net_call  as (
   ) t(request_id)
 )
 update schema_definition
-set request_id = net_call.request_id
+set fake_data_request_id = net_call.request_id
 from net_call
 where schema_definition.id = :fake_schema_id::int;
 
