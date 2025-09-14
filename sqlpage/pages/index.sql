@@ -45,6 +45,9 @@ select 'select'           as type,
   ) as options
 from schema_definition;
 
+select 'button' as component;
+select 'Refresh' as title, '.' as  link, 'refresh' as icon;
+
 select 'list' as component,
   format('Active Sessions: %s / %s',
       (select count(*) from active_session),
@@ -61,8 +64,8 @@ select 'database' as icon,
   case when create_response->>'Id' is not null and start_request_id is null then format('handle/start_session.sql?session_id=%s', session.id) end       as link,
   format('edit_session?session_id=%s', session.id)                                                                         as edit_link,
   format('handle/stop_session.sql?session_id=%s', session.id)                                                              as delete_link,
-  format($s$%s (%s) @ `Port %s` | %s ago $s$,
-      sd.prompt,
+  sd.prompt as title,
+  format($s$%1$s @ `psql -h localhost -p %2$s -U postgres` | Created %3$s ago$s$,
       case when stop_request_id is not null and stop_response is null then 'Stopping'
            when stop_response->>'status_code' = '204' then 'Stopped'
            when start_request_id is not null and start_response is null then 'Starting'
@@ -72,8 +75,11 @@ select 'database' as icon,
            else ''
       end,
       port,
-      to_char(age(now(), session.created_at),
-      'MI"m" SS"s"')) as description_md
+      coalesce(nullif(extract(day from age(now(), session.created_at))::int, 0)::text || 'd ', '') ||
+      coalesce(nullif(extract(hour from age(now(), session.created_at))::int, 0)::text || 'h ', '') ||
+      coalesce(nullif(extract(minute from age(now(), session.created_at))::int, 0)::text || 'm ', '') ||
+      coalesce(nullif(extract(second from age(now(), session.created_at))::int, 0)::text || 's ', '')
+      ) as description_md
 from session
 join schema_definition sd on sd.id = session.schema_id
 where session.id in (select id from active_session)

@@ -13,7 +13,7 @@ net_req as (
               'Image', 'postgres',
               'Env', array['POSTGRES_PASSWORD=hunter2'],
               'HostConfig', json_build_object(
-                  'AutoRemove', true,
+                  'AutoRemove', false,
                   'Binds', array[
                     format('%s:/docker-entrypoint-initdb.d/init.sql:ro',
                       write_schema_seed_file($new_session_schema_id::int))

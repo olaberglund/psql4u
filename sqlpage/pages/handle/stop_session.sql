@@ -6,7 +6,7 @@ with session_container as (
 net_req as (
     select
       net.http_delete(
-            url => format('http://localhost:2375/containers/%s?force'::text, container_id)
+            url => format('http://localhost:2375/containers/%s?force=true'::text, container_id)
       )
       as request_id
     from session_container
