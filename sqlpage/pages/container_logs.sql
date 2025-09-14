@@ -1,3 +1,4 @@
+select 'cookie' as component, 'show_alert' as name, true as remove;
 select 'dynamic' as component, sqlpage.run_sql('shell.sql', json_build_object('from_url', '/index.sql')) as properties;
 
 select 'text' as component, format('Container logs for "%s"', prompt) as title
