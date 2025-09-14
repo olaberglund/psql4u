@@ -51,7 +51,7 @@ create table if not exists session (
 );
 
 create or replace view active_session as (
-  select id, port
+  select id, port, create_response
   from session
   -- a session is active if it has not been successfully stopped,
   -- or didn't exist when attempting to stop it.

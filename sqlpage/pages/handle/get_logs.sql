@@ -4,6 +4,12 @@ set container_id =  (
   where id = $session_id::int
 );
 
+select 'cookie' as component, 'show_alert' as name,
+  jsonb_build_object('name', 'session_unknown', 'session_id', $session_id)::text as value;
+
+select 'redirect' as component, '../index.sql' as link
+where $container_id not in (select create_response->>'Id' from active_session);
+
 set logs = sqlpage.exec('docker', 'logs', $container_id);
 
 update session
